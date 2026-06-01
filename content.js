@@ -46,7 +46,15 @@ const CONTENT = {
     {name:"Mission Control",how:"Swipe up with three or four fingers",ico:"up",doc:"https://support.apple.com/guide/mac-help/mission-control-mh35798/mac"},
     {name:"Switch full-screen apps",how:"Swipe left or right with three fingers",ico:"side",doc:"https://support.apple.com/guide/mac-help/use-trackpad-and-mouse-gestures-mh35884/mac"},
     {name:"Show Desktop",how:"Spread thumb and three fingers apart",ico:"spread",doc:"https://support.apple.com/guide/mac-help/use-trackpad-and-mouse-gestures-mh35884/mac"},
-    {name:"Zoom in and out",how:"Pinch with two fingers",ico:"pinch",doc:"https://support.apple.com/guide/mac-help/zoom-in-on-the-screen-mchlp2745/mac"}
+    {name:"Zoom in and out",how:"Pinch with two fingers",ico:"pinch",doc:"https://support.apple.com/guide/mac-help/zoom-in-on-the-screen-mchlp2745/mac"},
+    {name:"Notification Center",how:"Swipe left with two fingers from the right edge of the trackpad",ico:"side",doc:"https://support.apple.com/guide/mac-help/use-trackpad-and-mouse-gestures-mh35884/mac"},
+    {name:"Look something up",how:"Force click, or tap with three fingers, on a word or address",ico:"tap",doc:"https://support.apple.com/guide/mac-help/use-trackpad-and-mouse-gestures-mh35884/mac"},
+    {name:"App Expos\u00e9",how:"Swipe down with three or four fingers to see every window of the app you're using",ico:"down",doc:"https://support.apple.com/guide/mac-help/mission-control-mh35798/mac"}
+  ],
+  control:[
+    {t:"What it is",ico:"info",body:"The panel of quick settings in the top-right of the menu bar: Wi-Fi, Bluetooth, sound, brightness, Focus, and more, all in one place."},
+    {t:"How to open it",ico:"hand",body:"Click the two-switch icon in the menu bar. Click a control to toggle it, or click its name to expand the full options."},
+    {t:"How to customize it",ico:"sliders",body:"Open System Settings \u203a Control Center to choose what appears, or click Edit Controls at the bottom of the panel to rearrange it."}
   ],
   apps:[
     {name:"Finder",icon:"finder",desc:"Browse files and folders, the way File Explorer did. The smiley icon lives at the left end of the Dock.",url:"https://support.apple.com/guide/mac-help/welcome/mac"},
@@ -59,7 +67,11 @@ const CONTENT = {
     {name:"Photos",icon:"photos",desc:"Your picture library, with simple editing tools and all your saved screenshots.",url:"https://support.apple.com/guide/photos/welcome/mac"},
     {name:"System Settings",icon:"settings",desc:"Where every preference lives, from Wi-Fi and displays to trackpad behavior. The Mac's Control Panel.",url:"https://support.apple.com/guide/mac-help/change-system-settings/mac"},
     {name:"Spotlight",icon:"spotlight",desc:"Press \u2318 + Space, then type to open apps, find files, do quick math, and search the web.",url:"https://support.apple.com/guide/mac-help/search-with-spotlight-mchlp1008/mac"},
-    {name:"Tips",icon:"tips",desc:"Apple's built-in app of short how-tos and demo videos for getting more out of your Mac.",url:"https://support.apple.com/guide/tips/welcome/web"}
+    {name:"Tips",icon:"tips",desc:"Apple's built-in app of short how-tos and demo videos for getting more out of your Mac.",url:"https://support.apple.com/guide/tips/welcome/web"},
+    {name:"Maps",icon:"maps",desc:"Get directions, explore places, and save the spots you want to come back to.",url:"https://support.apple.com/guide/maps/welcome/mac"},
+    {name:"GarageBand",icon:"garageband",desc:"A full music studio for recording and mixing audio. Great for podcasts and class projects.",url:"https://support.apple.com/guide/garageband/welcome/mac"},
+    {name:"iMovie",icon:"imovie",desc:"Edit video with titles, transitions, and music. Easy to learn, capable enough for real projects.",url:"https://support.apple.com/guide/imovie/welcome/mac"},
+    {name:"Passwords",icon:"passwords",desc:"Stores your logins and passkeys securely and fills them in across your Apple devices.",url:"https://support.apple.com/guide/passwords/welcome/mac"}
   ],
   faq:[
     {q:"How do I take a screenshot?",a:"Press \u2318 + Shift + 4 to capture part of the screen, or \u2318 + Shift + 3 for the whole thing. Press \u2318 + Shift + 5 for the full screenshot and screen-recording toolbar."},
@@ -72,7 +84,8 @@ const CONTENT = {
   ],
   resources:[
     {rname:"Apple Support",rdesc:"Official help for Mac and macOS apps",url:"https://support.apple.com"},
-    {rname:"Mac User Guide",rdesc:"The full built-in guide for macOS",url:"https://support.apple.com/guide/mac-help/welcome/mac"}
+    {rname:"Mac User Guide",rdesc:"The full built-in guide for macOS",url:"https://support.apple.com/guide/mac-help/welcome/mac"},
+    {rname:"Apple Education Community",rdesc:"Free lessons, workshops, and ideas from educators using Apple in the classroom.",url:"https://education.apple.com/"}
   ],
   accessibility:[
     {name:"Zoom in on the screen",desc:"Magnify the whole screen or just one area to read small text more easily.",ico:"zoom",url:"https://support.apple.com/guide/mac-help/zoom-in-on-your-mac-screen-mchl779716b8/mac"},
@@ -80,7 +93,10 @@ const CONTENT = {
     {name:"Dictate instead of type",desc:"Talk and your Mac types it out. Useful for notes, essays, and assignments.",ico:"dictate",url:"https://support.apple.com/guide/mac-help/use-dictation-mh40584/mac"},
     {name:"Have your Mac read aloud",desc:"Select any text and have it read back to you, with words highlighted as it goes.",ico:"speak",url:"https://support.apple.com/guide/mac-help/have-your-mac-speak-text-thats-on-the-screen-mh27448/mac"},
     {name:"Reduce on-screen motion",desc:"Calm down animations and movement to cut distraction and focus while you work.",ico:"motion",url:"https://support.apple.com/guide/mac-help/change-display-settings-for-accessibility-unac089/mac"},
-    {name:"Adjust display colors",desc:"Apply color filters or a tint to make text easier to read and reduce eye strain.",ico:"color",url:"https://support.apple.com/guide/mac-help/change-display-settings-for-accessibility-unac089/mac"}
+    {name:"Adjust display colors",desc:"Apply color filters or a tint to make text easier to read and reduce eye strain.",ico:"color",url:"https://support.apple.com/guide/mac-help/change-display-settings-for-accessibility-unac089/mac"},
+    {name:"VoiceOver",desc:"A full screen reader that describes what's on screen and lets you navigate by keyboard or trackpad.",ico:"access",url:"https://support.apple.com/guide/mac-help/change-voiceover-settings-for-accessibility-mh40578/mac"},
+    {name:"Voice Control",desc:"Operate your Mac and edit text entirely by voice, no mouse or keyboard needed.",ico:"dictate",url:"https://support.apple.com/guide/mac-help/control-your-mac-and-apps-using-voice-control-mh40719/mac"},
+    {name:"Increase contrast",desc:"Sharpen edges and boost contrast system-wide to make text and controls easier to see.",ico:"contrast",url:"https://support.apple.com/guide/mac-help/change-display-settings-for-accessibility-unac089/mac"}
   ],
   // Video Gallery — replace yt with the real YouTube video ID (the part after v= or youtu.be/).
   // duration is optional display text. Thumbnails auto-pull from YouTube when yt is a real ID.
@@ -99,6 +115,7 @@ const BROWSE=[
   {id:"switch",t:"Windows vs. Mac",d:"How everything maps over",ico:"swap",k:"switch"},
   {id:"shortcuts",t:"Keyboard Shortcuts",d:"The keys that save time",ico:"cmd",k:"shortcuts"},
   {id:"gestures",t:"Gestures",d:"Trackpad moves to know",ico:"hand",k:"gestures"},
+  {id:"control",t:"Control Center",d:"Quick settings in one place",ico:"sliders",k:"control"},
   {id:"apps",t:"Native Apps",d:"What comes built in",ico:"grid",k:"apps"},
   {id:"accessibility",t:"Accessibility",d:"Built-in tools that help",ico:"access",k:"accessibility"},
   {id:"videos",t:"Video Gallery",d:"Short how-to videos",ico:"video",k:"videos"},
@@ -124,7 +141,10 @@ const ICONS={
   dictate:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3m-2.5 0h5"/>',
   speak:'<path d="M4 9.5h3l4-3.5v12l-4-3.5H4z"/><path d="M15 9a4 4 0 0 1 0 6M17.5 6.5a7.5 7.5 0 0 1 0 11"/>',
   motion:'<circle cx="12" cy="12" r="9.5"/><path d="M12 7v5l3.5 2"/><path d="M12 12 8.5 9.5" opacity=".4"/>',
-  color:'<path d="M12 3a9 9 0 0 0 0 18c1.4 0 2-1 2-2 0-1.3-1-1.5-1-2.5 0-.8.7-1.5 1.5-1.5H17a4 4 0 0 0 4-4c0-4.4-4-8-9-8z"/><circle cx="8" cy="11" r="1.1" fill="currentColor" stroke="none"/><circle cx="12" cy="8" r="1.1" fill="currentColor" stroke="none"/><circle cx="16" cy="10.5" r="1.1" fill="currentColor" stroke="none"/>'
+  color:'<path d="M12 3a9 9 0 0 0 0 18c1.4 0 2-1 2-2 0-1.3-1-1.5-1-2.5 0-.8.7-1.5 1.5-1.5H17a4 4 0 0 0 4-4c0-4.4-4-8-9-8z"/><circle cx="8" cy="11" r="1.1" fill="currentColor" stroke="none"/><circle cx="12" cy="8" r="1.1" fill="currentColor" stroke="none"/><circle cx="16" cy="10.5" r="1.1" fill="currentColor" stroke="none"/>',
+  info:'<circle cx="12" cy="12" r="9.5"/><path d="M12 11v5"/><circle cx="12" cy="7.7" r=".6" fill="currentColor" stroke="none"/>',
+  sliders:'<path d="M4 8h7M15 8h5"/><circle cx="13" cy="8" r="2"/><path d="M4 16h3M11 16h9"/><circle cx="9" cy="16" r="2"/>',
+  contrast:'<circle cx="12" cy="12" r="9"/><path d="M12 3v18a9 9 0 0 0 0-18z" fill="currentColor" stroke="none"/>'
 };
 
 const APP_ICONS={
@@ -139,5 +159,9 @@ const APP_ICONS={
   settings:'<rect width="52" height="52" rx="13" fill="#8e8e93"/><circle cx="26" cy="26" r="13" fill="none" stroke="#fff" stroke-width="3"/><circle cx="26" cy="26" r="4" fill="#fff"/><g stroke="#fff" stroke-width="3" stroke-linecap="round"><path d="M26 9v5M26 38v5M9 26h5M38 26h5M14 14l3.5 3.5M34.5 34.5 38 38M38 14l-3.5 3.5M17.5 34.5 14 38"/></g>',
   tips:'<rect width="52" height="52" rx="13" fill="#ffd23f"/><path d="M26 13a9 9 0 0 0-5 16.5c.8.6 1.3 1.3 1.4 2.2l.3 2.3h6.6l.3-2.3c.1-.9.6-1.6 1.4-2.2A9 9 0 0 0 26 13z" fill="#fff"/><path d="M22 38h8M23 41h6" stroke="#c9920a" stroke-width="2.4" stroke-linecap="round"/>',
   spotlight:'<rect width="52" height="52" rx="13" fill="#2a2a2e"/><circle cx="23" cy="23" r="9" fill="none" stroke="#fff" stroke-width="3"/><path d="M30 30l8 8" stroke="#fff" stroke-width="3.4" stroke-linecap="round"/>',
+  maps:'<rect width="52" height="52" rx="13" fill="#eef2ea"/><path d="M0 32 21 13l31 15v24H0z" fill="#bfe39a"/><path d="M0 0h20L7 20 0 16z" fill="#a9dcf2"/><path d="M19 7 29 45" stroke="#fff" stroke-width="4" stroke-linecap="round"/><path d="M31 13a6 6 0 0 0-6 6c0 4.2 6 9 6 9s6-4.8 6-9a6 6 0 0 0-6-6z" fill="#ff5d52"/><circle cx="31" cy="19" r="2.1" fill="#fff"/>',
+  garageband:'<rect width="52" height="52" rx="13" fill="#2c2c2e"/><circle cx="26" cy="26" r="12.5" fill="none" stroke="#ff8a3d" stroke-width="3"/><circle cx="26" cy="26" r="3" fill="#ff8a3d"/><path d="M26 13.5v4M26 34.5v4M13.5 26h4M34.5 26h4" stroke="#ff8a3d" stroke-width="2.6" stroke-linecap="round"/>',
+  imovie:'<rect width="52" height="52" rx="13" fill="#a14fe0"/><rect x="12" y="17" width="28" height="18" rx="3" fill="#fff"/><path d="M23 23v6l6-3z" fill="#a14fe0"/><path d="M15.5 11l1 2.6 2.6 1-2.6 1-1 2.6-1-2.6-2.6-1 2.6-1z" fill="#fff"/>',
+  passwords:'<rect width="52" height="52" rx="13" fill="#5b97f0"/><circle cx="21" cy="22" r="6.5" fill="none" stroke="#fff" stroke-width="3"/><path d="M25.5 26.5 37 38" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M31.5 32.5l3.2-3.2M35 36l3.2-3.2" stroke="#fff" stroke-width="3" stroke-linecap="round"/>',
   generic:'<rect width="52" height="52" rx="13" fill="#2a2a2a"/><rect x="14" y="14" width="24" height="24" rx="6" fill="none" stroke="#8a8985" stroke-width="2"/>'
 };

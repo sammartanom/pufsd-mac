@@ -51,6 +51,7 @@ button{font:inherit;background:none;border:none;color:inherit;cursor:pointer;pad
 ::selection{background:var(--accent);color:var(--bg)}
 :focus{outline:none}
 :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px;box-shadow:0 0 0 4px var(--accent-soft)}
+input:focus,input:focus-visible,textarea:focus,textarea:focus-visible{outline:none;box-shadow:none}
 
 .wrap{width:100%;max-width:var(--max);margin:0 auto;padding:0 var(--gutter);position:relative;z-index:1}
 @media (max-width:560px){:root{--gutter:16px}}
@@ -75,7 +76,6 @@ body.nav-open .nav-panel{transform:translateX(0)}
 .nav-panel nav{flex:1;display:flex;flex-direction:column}
 
 .nav-search{display:flex;align-items:center;gap:10px;background:var(--surface-2);border-radius:12px;padding:12px 14px;margin-bottom:30px}
-.nav-search:focus-within{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.4)}
 .nav-search svg{color:var(--t3);flex:none}
 .nav-search input{flex:1;min-width:0;background:none;border:0;outline:none;color:var(--t1);font:inherit;font-size:16px}
 .nav-search input::placeholder{color:var(--t3)}
@@ -141,11 +141,10 @@ body.nav-open .nav-panel{transform:translateX(0)}
 .hero{padding:160px 0 80px;text-align:left}
 .hero h1{font-size:clamp(40px,7.4vw,84px);font-weight:560;line-height:1.04;letter-spacing:-.028em;color:var(--t1);margin:0}
 .hero h1 .dot{color:var(--accent)}
-.hero p{font-size:clamp(16px,1.8vw,19px);line-height:1.55;color:var(--text-on-bg);max-width:52ch;margin:var(--s-5) 0 0;text-wrap:pretty}
+.hero p{font-size:18px;line-height:1.55;color:var(--text-on-bg);max-width:46ch;margin:var(--s-5) 0 0;text-wrap:pretty}
 
 /* search field (used by per-page FAQ + Videos search) */
-.search-field{position:relative;flex:1;border-radius:var(--rs);background:#222;box-shadow:inset 0 0 0 1px var(--rule);transition:box-shadow .24s var(--ease)}
-.search-field:focus-within{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.4)}
+.search-field{position:relative;flex:1;border-radius:var(--rs);background:#222}
 .search-field svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--t3)}
 .search-field input{width:100%;height:46px;background:transparent;border:none;border-radius:var(--rs);color:var(--t1);font:inherit;font-size:15px;padding:0 14px 0 42px}
 .search-field input::placeholder{color:var(--t3)}
@@ -158,7 +157,7 @@ body.nav-open .nav-panel{transform:translateX(0)}
 section{padding:var(--s-8) 0}
 .sec-head{text-align:left;margin-bottom:var(--s-5)}
 .sec-head h2{font-size:clamp(28px,4.8vw,50px);font-weight:560;line-height:1.06;letter-spacing:-0.01px;color:var(--t1);text-wrap:balance}
-.sec-head .lead{color:var(--text-on-bg);font-size:18px;margin-top:var(--s-2);max-width:60ch;text-wrap:pretty}
+.sec-head .lead{color:var(--text-on-bg);font-size:18px;margin-top:var(--s-2);max-width:46ch;text-wrap:pretty}
 
 /* ---------- browse cards ---------- */
 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s-3)}
@@ -300,6 +299,7 @@ section{padding:var(--s-8) 0}
 /* ---------- resources / link cards (title over subtitle) ---------- */
 .res{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--s-3)}
 .res.res-3{grid-template-columns:repeat(3,1fr)}
+.res.res-2{grid-template-columns:repeat(2,1fr)}
 .res a{background:var(--glass-card);border-radius:var(--rc);padding:var(--pad-card);display:flex;flex-direction:column;min-height:120px;transition:background .24s var(--ease),transform .24s var(--ease)}
 .res a:hover{background:var(--glass-card-hover);transform:translateY(-2px)}
 .res .ext svg{transition:transform .25s var(--ease)}
@@ -309,7 +309,7 @@ section{padding:var(--s-8) 0}
 .res .rdesc{display:block;color:var(--t2);font-size:17px;margin-top:7px;line-height:1.45;text-wrap:pretty}
 .res .ext{color:var(--t2);flex-shrink:0;display:inline-flex;align-items:center;transition:color .24s var(--ease)}
 .res a:hover .ext{color:var(--t1)}
-@media (max-width:760px){.res.res-3{grid-template-columns:1fr}}
+@media (max-width:760px){.res.res-3,.res.res-2{grid-template-columns:1fr}}
 /* request-help action button (matches resource card shape, accent-tinted) */
 .res-help{position:relative;text-align:left;width:100%;background:var(--accent-soft);border-radius:var(--rc);padding:var(--pad-card);display:flex;flex-direction:column;min-height:120px;cursor:pointer;font:inherit;overflow:hidden;transition:background .24s var(--ease),transform .24s var(--ease)}
 .res-help:hover{background:rgba(94,234,142,.2);transform:translateY(-2px)}
@@ -331,13 +331,21 @@ section{padding:var(--s-8) 0}
 .gest{background:var(--glass-card);border-radius:var(--ri);padding:var(--pad-row);display:flex;flex-direction:column;min-width:0;transition:background .24s var(--ease),transform .24s var(--ease)}
 .gest:hover{background:var(--glass-card-hover);transform:translateY(-2px)}
 .gest .gname{display:block;color:var(--t1);font-size:17px;letter-spacing:-0.01px;line-height:1.3}
-.gest .ghow{display:block;color:var(--t2);font-size:17px;margin-top:2px;line-height:1.35;letter-spacing:-0.01px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gest .ghow{display:block;color:var(--t2);font-size:17px;margin-top:2px;line-height:1.35;letter-spacing:-0.01px}
 @media (max-width:760px){.gest-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:480px){.gest-grid{grid-template-columns:1fr}}
 .doc-link{display:inline-flex;align-items:center;gap:6px;color:var(--accent);font-size:15px;font-weight:460;transition:opacity .2s var(--ease)}
 .doc-link:hover{opacity:.8}
 .doc-link svg,.app-card a.app-link svg{transition:transform .25s var(--ease)}
 .doc-link:hover svg,.app-card a.app-link:hover svg{transform:translate(2px,-2px)}
+
+/* ---------- control center (info cards, 3-up, non-clickable) ---------- */
+.cc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s-3)}
+@media (max-width:760px){.cc-grid{grid-template-columns:1fr}}
+.cc-card{background:var(--glass-card);border-radius:var(--rc);padding:var(--pad-card);display:flex;flex-direction:column;min-height:190px}
+.cc-ico{color:var(--t1);display:inline-flex;align-self:flex-start;margin-bottom:auto}
+.cc-name{display:block;color:var(--t1);font-size:20px;font-weight:560;letter-spacing:-0.012em;line-height:1.2;margin-top:var(--s-6);text-wrap:balance}
+.cc-desc{display:block;color:var(--t2);font-size:16px;line-height:1.45;margin-top:7px;text-wrap:pretty}
 
 /* ---------- agent chat window (overlay) ---------- */
 /* ---------- AI assistant: slide-in panel (mirrors the nav), opened from the menu ---------- */
@@ -375,8 +383,7 @@ body.ai-open .ai-panel{transform:translateX(0)}
 @keyframes typingBlink{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
 @media (prefers-reduced-motion:reduce){.msg.typing .dot{animation:none;opacity:.6}}
 .chat-input{display:flex;align-items:flex-end;gap:var(--s-3);padding-top:var(--s-4);flex-shrink:0}
-.chat-field{flex:1;display:flex;border-radius:var(--rs);background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--rule);transition:box-shadow .24s var(--ease)}
-.chat-field:focus-within{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.4)}
+.chat-field{flex:1;display:flex;border-radius:var(--rs);background:var(--surface-2)}
 .chat-field textarea{width:100%;resize:none;background:transparent;border:none;color:var(--t1);font:inherit;font-size:15px;line-height:22px;padding:13px 16px;height:48px;min-height:48px;max-height:120px;display:block}
 .chat-field textarea:focus{outline:none}
 .chat-field textarea::placeholder{color:var(--t3)}
@@ -456,16 +463,15 @@ main>.wrap:has(.hero){padding-top:0}
 @media (min-width:768px){
   body{font-size:20px}
   /* body copy */
-  .sec-head .lead{font-size:20px}
-  .hero p{font-size:21px}
-  .card .desc,.a11y-desc{font-size:17px}
+  .sec-head .lead,.hero p{font-size:20px}
+  .card .desc,.a11y-desc,.cc-desc{font-size:17px}
   .app-card .app-desc{font-size:19px}
   .exp-a{font-size:18px}
   .res .rdesc,.res-help .rdesc{font-size:18px}
   .gest .ghow{font-size:18px}
   .cmp-topic,.cmp-val{font-size:18px}
   /* secondary headings */
-  .card h3,.a11y-name{font-size:22px}
+  .card h3,.a11y-name,.cc-name{font-size:22px}
   .app-card .app-name{font-size:20px}
   .exp-title{font-size:20px}
 }

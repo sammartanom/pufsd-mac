@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0a0a0a">
 <title>Content Editor — Mac Hub</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="stylesheet" href="styles.css?v=5">
+<link rel="stylesheet" href="styles.css?v=7">
 <style>
 /* editor-only styles (kept here so the shared sheet stays page-facing) */
 .adm-wrap{max-width:900px;margin:0 auto;padding:0 var(--gutter)}
@@ -70,24 +70,26 @@
     </div>
   </div>
 </main>
-<script src="content.js?v=5"></script>
-<script src="app.js?v=5"></script>
+<script src="content.js?v=7"></script>
+<script src="app.js?v=7"></script>
 <script>
 /* ---- editor schema: which fields each section exposes ---- */
-const A11Y_ICONS=['zoom','text','dictate','speak','motion','color','access'];
+const A11Y_ICONS=['zoom','text','dictate','speak','motion','color','contrast','access'];
+const CC_ICONS=['info','hand','sliders'];
 const APP_ICON_KEYS=Object.keys(APP_ICONS);
 const SCHEMA={
   meta:[['title','Title','text'],['tagline','Tagline','area']],
   switch:[['topic','Task','text'],['win','On Windows','text'],['mac','On a Mac','area']],
   gestures:[['name','Gesture','text'],['how','How to do it','text'],['ico','Icon key','text'],['doc','Doc URL','text']],
+  control:[['t','Heading','text'],['ico','Icon',CC_ICONS],['body','Text','area']],
   apps:[['name','Name','text'],['icon','Icon',APP_ICON_KEYS],['desc','Description','area'],['url','URL','text']],
   accessibility:[['name','Name','text'],['ico','Icon',A11Y_ICONS],['desc','Description','area'],['url','Doc URL','text']],
   videos:[['title','Title','text'],['yt','YouTube ID','text'],['duration','Duration','text']],
   faq:[['q','Question','text'],['a','Answer','area']],
   resources:[['rname','Name','text'],['rdesc','Description','text'],['url','URL','text']]
 };
-const TAB_LABELS={meta:'Home / Meta',switch:'Windows vs. Mac',shortcuts:'Shortcuts',gestures:'Gestures',apps:'Apps',accessibility:'Accessibility',videos:'Videos',faq:'FAQ',resources:'Resources'};
-const TABS=['meta','switch','shortcuts','gestures','apps','accessibility','videos','faq','resources'];
+const TAB_LABELS={meta:'Home / Meta',switch:'Windows vs. Mac',shortcuts:'Shortcuts',gestures:'Gestures',control:'Control Center',apps:'Apps',accessibility:'Accessibility',videos:'Videos',faq:'FAQ',resources:'Resources'};
+const TABS=['meta','switch','shortcuts','gestures','control','apps','accessibility','videos','faq','resources'];
 
 /* working copy of the data (deep clone so edits are isolated until export) */
 const DATA=JSON.parse(JSON.stringify(CONTENT));
@@ -212,6 +214,7 @@ function buildContentJs(){
     +'\n    ]}'
   ).join(',\n')+'\n  ],\n';
   out+='  gestures:[\n'+serializeArr(DATA.gestures,['name','how','ico','doc'])+'\n  ],\n';
+  out+='  control:[\n'+serializeArr(DATA.control,['t','ico','body'])+'\n  ],\n';
   out+='  apps:[\n'+serializeArr(DATA.apps,['name','icon','desc','img','url'])+'\n  ],\n';
   out+='  faq:[\n'+serializeArr(DATA.faq,['q','a'])+'\n  ],\n';
   out+='  resources:[\n'+serializeArr(DATA.resources,['rname','rdesc','url'])+'\n  ],\n';

@@ -21,6 +21,7 @@ const NAV=[
   {key:'switch',       url:'windows-vs-mac.html', label:'Windows vs. Mac', ico:'swap'},
   {key:'shortcuts',    url:'shortcuts.html',      label:'Shortcuts',       ico:'cmd'},
   {key:'gestures',     url:'gestures.html',       label:'Gestures',        ico:'hand'},
+  {key:'control',      url:'control-center.html', label:'Control Center',  ico:'sliders'},
   {key:'apps',         url:'apps.html',           label:'Apps',            ico:'grid'},
   {key:'accessibility',url:'accessibility.html',  label:'Accessibility',   ico:'access'},
   {key:'videos',       url:'videos.html',         label:'Videos',          ico:'video'},
@@ -70,6 +71,15 @@ function renderGestures(){
   el.innerHTML=CONTENT.gestures.map(g=>
     '<div class="gest" data-s="'+esc((g.name+' '+g.how).toLowerCase())+'">'
     +'<span class="gname">'+esc(g.name)+'</span><span class="ghow">'+esc(g.how)+'</span></div>'
+  ).join('');
+}
+function renderControlCenter(){
+  const el=document.getElementById('ccGrid');if(!el)return;
+  el.innerHTML=CONTENT.control.map(c=>
+    '<div class="cc-card" data-s="'+esc((c.t+' '+c.body).toLowerCase())+'">'
+    +'<span class="cc-ico">'+svg(c.ico,30)+'</span>'
+    +'<span class="cc-name">'+esc(c.t)+'</span>'
+    +'<span class="cc-desc">'+esc(c.body)+'</span></div>'
   ).join('');
 }
 function renderApps(){
@@ -134,7 +144,7 @@ function helpCard(){
     +'<span class="help-copied" aria-hidden="true">Email copied!</span></button>';
 }
 
-const RENDER={home:renderHome,switch:renderSwitch,shortcuts:renderShortcuts,gestures:renderGestures,apps:renderApps,accessibility:renderAccessibility,videos:renderVideos,faq:renderFaq,resources:renderResources};
+const RENDER={home:renderHome,switch:renderSwitch,shortcuts:renderShortcuts,gestures:renderGestures,control:renderControlCenter,apps:renderApps,accessibility:renderAccessibility,videos:renderVideos,faq:renderFaq,resources:renderResources};
 
 /* ---------- copy-to-clipboard (help desk) ---------- */
 function fallbackCopy(text,cb){
@@ -250,6 +260,7 @@ function buildIndex(){
   CONTENT.switch.forEach(r=>idx.push({cat:'Windows vs. Mac',title:r.topic,url:'windows-vs-mac.html',text:(r.topic+' '+r.win+' '+r.mac).toLowerCase()}));
   CONTENT.shortcuts.forEach(g=>g.items.forEach(it=>idx.push({cat:'Shortcut',title:it.label,url:'shortcuts.html',text:it.label.toLowerCase()})));
   CONTENT.gestures.forEach(g=>idx.push({cat:'Gesture',title:g.name,url:'gestures.html',text:(g.name+' '+g.how).toLowerCase()}));
+  CONTENT.control.forEach(c=>idx.push({cat:'Control Center',title:c.t,url:'control-center.html',text:(c.t+' '+c.body).toLowerCase()}));
   CONTENT.apps.forEach(a=>idx.push({cat:'App',title:a.name,url:'apps.html',text:(a.name+' '+a.desc).toLowerCase()}));
   CONTENT.accessibility.forEach(a=>idx.push({cat:'Accessibility',title:a.name,url:'accessibility.html',text:(a.name+' '+a.desc).toLowerCase()}));
   CONTENT.videos.forEach(v=>idx.push({cat:'Video',title:v.title,url:'videos.html',text:v.title.toLowerCase()}));
