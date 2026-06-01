@@ -340,17 +340,8 @@ section{padding:var(--s-8) 0}
 .doc-link:hover svg,.app-card a.app-link:hover svg{transform:translate(2px,-2px)}
 
 /* ---------- agent chat window (overlay) ---------- */
-/* ---------- AI assistant: bottom-corner toggle + slide-in panel (mirrors the nav) ---------- */
-.ai-bar{position:fixed;inset:auto 0 0 auto;z-index:130;display:flex;align-items:center;justify-content:flex-end;padding:24px;pointer-events:none}
-.ai-toggle{pointer-events:auto;position:relative;width:52px;height:52px;border-radius:50%;background:var(--bg-card);color:var(--t1);display:grid;place-items:center;cursor:pointer;transition:background .24s var(--ease)}
-.ai-toggle:hover{background:var(--glass-card-hover)}
-.ai-toggle .ai-ico{position:absolute;display:grid;place-items:center;transition:opacity .26s var(--ease),transform .26s var(--ease)}
-.ai-toggle .ai-ico-spark{color:var(--accent)}
-.ai-toggle .ai-ico-x{opacity:0;transform:scale(.6) rotate(-30deg)}
-body.ai-open .ai-toggle .ai-ico-spark{opacity:0;transform:scale(.6) rotate(30deg)}
-body.ai-open .ai-toggle .ai-ico-x{opacity:1;transform:none;color:var(--t1)}
-/* keep the two corner controls from colliding: hide the opposite trigger while a panel is open */
-body.nav-open .ai-bar{opacity:0;visibility:hidden;transition:opacity .2s var(--ease),visibility .2s var(--ease)}
+/* ---------- AI assistant: slide-in panel (mirrors the nav), opened from the menu ---------- */
+/* while the AI panel is open, hide the nav toggle so the top-right stays clean */
 body.ai-open .nav-bar{opacity:0;visibility:hidden;transition:opacity .2s var(--ease),visibility .2s var(--ease)}
 
 .ai-scrim{position:fixed;inset:0;z-index:110;background:rgba(0,0,0,.4);opacity:0;visibility:hidden;transition:opacity .3s var(--ease),visibility .3s var(--ease)}
@@ -358,11 +349,16 @@ body.ai-open .ai-scrim{opacity:1;visibility:visible}
 
 .ai-panel{position:fixed;top:0;right:0;z-index:120;height:100dvh;width:min(460px,100%);background:var(--bg-card);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .44s var(--ease-spring);overflow:hidden}
 body.ai-open .ai-panel{transform:translateX(0)}
-/* top padding clears nothing; generous bottom padding clears the bottom-right toggle (mirror of the nav's top clearance) */
-.ai-inner{flex:1;display:flex;flex-direction:column;min-height:0;padding:52px 33px 104px 56px}
+
+/* back-to-menu arrow, top-left */
+.ai-back{position:absolute;top:20px;left:24px;z-index:1;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:var(--t2);background:transparent;cursor:pointer;transition:color .2s var(--ease),background .2s var(--ease)}
+.ai-back:hover{color:var(--t1);background:var(--surface-2)}
+
+.ai-inner{flex:1;display:flex;flex-direction:column;min-height:0;padding:84px 33px 40px 56px}
 .ai-head{flex-shrink:0;margin-bottom:var(--s-4)}
-.ai-title{display:block;font-size:27px;font-weight:500;letter-spacing:-.018em;color:var(--t1)}
-.ai-sub{display:block;margin-top:6px;font-size:14px;line-height:1.45;color:var(--t3);max-width:34ch}
+.ai-title{display:flex;align-items:center;gap:10px;font-size:27px;font-weight:500;letter-spacing:-.018em;color:var(--t1)}
+.ai-spark{color:var(--accent);flex:none}
+.ai-sub{display:block;margin-top:8px;font-size:14px;line-height:1.45;color:var(--t3);max-width:34ch}
 
 .chat-log{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:var(--s-3);padding-right:4px}
 .msg{max-width:88%;padding:11px 15px;border-radius:14px;font-size:15px;line-height:1.5}
@@ -392,12 +388,12 @@ body.ai-open .ai-panel{transform:translateX(0)}
 .cta.alt{background:transparent;color:var(--t2)}
 .cta.alt:hover{color:var(--t1);background:var(--surface-2)}
 @media (max-width:600px){
-  .ai-bar{padding:16px}
   .ai-panel{width:100%}
-  .ai-inner{padding:48px 25px 96px 28px}
+  .ai-back{top:16px;left:16px}
+  .ai-inner{padding:76px 25px 32px 28px}
 }
 @media (prefers-reduced-motion:reduce){
-  .ai-toggle .ai-ico,.ai-scrim,.ai-panel{transition-duration:.001ms !important}
+  .ai-scrim,.ai-panel{transition-duration:.001ms !important}
 }
 
 /* ---------- admin ---------- */

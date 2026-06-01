@@ -189,20 +189,18 @@ async function sendChat(preset){
 let aiLastFocus=null;
 function aiIsOpen(){return document.body.classList.contains('ai-open');}
 function openChat(){
-  const toggle=document.getElementById('aiToggle'),panel=document.getElementById('aiPanel'),scrim=document.getElementById('aiScrim');
+  const panel=document.getElementById('aiPanel'),scrim=document.getElementById('aiScrim');
   if(!panel)return;
   if(navIsOpen())closeNav();
   aiLastFocus=document.activeElement;
   panel.hidden=false;if(scrim)scrim.hidden=false;
   requestAnimationFrame(()=>document.body.classList.add('ai-open'));
-  if(toggle){toggle.setAttribute('aria-expanded','true');toggle.setAttribute('aria-label','Close assistant');}
   setTimeout(()=>{const i=document.getElementById('chatInput');if(i)i.focus();},120);
 }
 function closeChat(){
-  const toggle=document.getElementById('aiToggle'),panel=document.getElementById('aiPanel'),scrim=document.getElementById('aiScrim');
+  const panel=document.getElementById('aiPanel'),scrim=document.getElementById('aiScrim');
   if(!panel)return;
   document.body.classList.remove('ai-open');
-  if(toggle){toggle.setAttribute('aria-expanded','false');toggle.setAttribute('aria-label','Ask AI');}
   const onEnd=e=>{
     if(e.target!==panel||e.propertyName!=='transform')return;
     panel.removeEventListener('transitionend',onEnd);
@@ -305,7 +303,7 @@ function wireReveal(){
 /* ============================================================
    CHROME INJECTION (header, footer, overlays) + wiring
    ============================================================ */
-const ICO_AGENT='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+ICONS.spark+'</svg>';
+const ICO_SPARK='<svg class="ai-spark" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.9 7.1L21 11l-7.1 1.9L12 20l-1.9-7.1L3 11l7.1-1.9z"/></svg>';
 
 function injectChrome(activeKey){
   // favicon + theme-color (kept out of every shell head)
@@ -345,14 +343,12 @@ function injectChrome(activeKey){
         +'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>'
       +'</a></div>'
     +'</nav></aside>'
-    // AI assistant: bottom-corner toggle + scrim + slide-in panel (mirrors the nav)
-    +'<div class="ai-bar"><button class="ai-toggle" id="aiToggle" aria-expanded="false" aria-controls="aiPanel" aria-label="Ask AI">'
-      +'<span class="ai-ico ai-ico-spark" aria-hidden="true">'+ICO_AGENT+'</span>'
-      +'<span class="ai-ico ai-ico-x" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></svg></span>'
-    +'</button></div>'
+    // AI assistant: scrim + slide-in panel, opened from the menu's Ask AI
     +'<div class="ai-scrim" id="aiScrim" hidden></div>'
-    +'<aside class="ai-panel" id="aiPanel" role="dialog" aria-modal="true" aria-label="AI assistant" hidden><div class="ai-inner">'
-      +'<div class="ai-head"><span class="ai-title">Ask AI</span><span class="ai-sub">Answers grounded in Apple Support and Pleasantville district guidance.</span></div>'
+    +'<aside class="ai-panel" id="aiPanel" role="dialog" aria-modal="true" aria-label="AI assistant" hidden>'
+      +'<button type="button" class="ai-back" id="aiBack" aria-label="Back to menu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>'
+      +'<div class="ai-inner">'
+      +'<div class="ai-head"><span class="ai-title">'+ICO_SPARK+'Ask AI</span><span class="ai-sub">Answers grounded in Apple Support and Pleasantville district guidance.</span></div>'
       +'<div class="chat-log" id="chatLog"><div class="msg sys">Ask anything about using your MacBook or iPad.</div>'
       +'<div class="chat-chips" id="chatChips">'
         +'<button type="button" class="chat-chip">How do I take a screenshot?</button>'
@@ -401,9 +397,9 @@ function wireChrome(){
   document.getElementById('chatInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}});
   document.querySelectorAll('.chat-chip').forEach(c=>c.addEventListener('click',()=>sendChat(c.textContent)));
 
-  // AI panel open/close (bottom-corner toggle mirrors the nav)
-  const aiToggle=document.getElementById('aiToggle');
-  if(aiToggle)aiToggle.addEventListener('click',()=>{aiIsOpen()?closeChat():openChat();});
+  // AI panel: opened from the menu's Ask AI; back arrow returns to the menu
+  const aiBack=document.getElementById('aiBack');
+  if(aiBack)aiBack.addEventListener('click',()=>{closeChat();openNav();});
   const aiScrim=document.getElementById('aiScrim');
   if(aiScrim)aiScrim.addEventListener('click',closeChat);
 
@@ -426,14 +422,14 @@ function wireChrome(){
     if(e.key==='Escape'){if(navIsOpen()){closeNav();return;}if(aiIsOpen()){closeChat();return;}closeVideo();return;}
     if(e.key==='Tab'){
       if(navIsOpen())trapTab(e,document.getElementById('navPanel'),toggle);
-      else if(aiIsOpen())trapTab(e,document.getElementById('aiPanel'),aiToggle);
+      else if(aiIsOpen())trapTab(e,document.getElementById('aiPanel'),null);
     }
   });
 }
 
 function trapTab(e,panel,trigger){
   if(!panel)return;
-  const f=[trigger].concat(Array.prototype.slice.call(panel.querySelectorAll('a[href],button:not([disabled]),input,textarea')));
+  const f=(trigger?[trigger]:[]).concat(Array.prototype.slice.call(panel.querySelectorAll('a[href],button:not([disabled]),input,textarea')));
   const i=f.indexOf(document.activeElement);
   if(e.shiftKey){if(i<=0){e.preventDefault();f[f.length-1].focus();}}
   else{if(i===f.length-1){e.preventDefault();f[0].focus();}}
