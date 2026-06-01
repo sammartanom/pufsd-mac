@@ -41,7 +41,7 @@ html,body{
   font-variation-settings:"opsz" 24,"wght" 440;
   -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
 }
-body{position:relative;font-size:18px;line-height:1.55;letter-spacing:-0.01px;min-height:100vh;text-rendering:optimizeLegibility;overflow-x:hidden;text-wrap:pretty}
+body{position:relative;font-size:18px;line-height:1.55;letter-spacing:0;min-height:100vh;text-rendering:optimizeLegibility;overflow-x:hidden;text-wrap:pretty}
 /* page titles stay bold; card headings sit at 500 */
 .hero h1,.sec-head h2,.gate h2,.admin-head h2{font-variation-settings:"opsz" 32,"wght" 560}
 .card h3,.cmp-topic,.exp-title,.app-card .app-name,.res .rname,.res-help .rname,.gest .gname{font-variation-settings:"opsz" 28,"wght" 460;font-weight:460}
@@ -139,7 +139,7 @@ body.nav-open .nav-panel{transform:translateX(0)}
 
 /* ---------- hero ---------- */
 .hero{padding:160px 0 80px;text-align:left}
-.hero h1{font-size:clamp(40px,7vw,72px);font-weight:560;line-height:1.04;letter-spacing:-.028em;color:var(--t1);margin:0}
+.hero h1{font-size:clamp(40px,7.4vw,84px);font-weight:560;line-height:1.04;letter-spacing:-.028em;color:var(--t1);margin:0}
 .hero h1 .dot{color:var(--accent)}
 .hero p{font-size:clamp(16px,1.8vw,19px);line-height:1.55;color:var(--text-on-bg);max-width:52ch;margin:var(--s-5) 0 0;text-wrap:pretty}
 
@@ -157,7 +157,7 @@ body.nav-open .nav-panel{transform:translateX(0)}
 /* ---------- sections ---------- */
 section{padding:var(--s-8) 0}
 .sec-head{text-align:left;margin-bottom:var(--s-5)}
-.sec-head h2{font-size:clamp(28px,4.4vw,42px);font-weight:560;line-height:1.06;letter-spacing:-0.01px;color:var(--t1);text-wrap:balance}
+.sec-head h2{font-size:clamp(28px,4.8vw,50px);font-weight:560;line-height:1.06;letter-spacing:-0.01px;color:var(--t1);text-wrap:balance}
 .sec-head .lead{color:var(--text-on-bg);font-size:18px;margin-top:var(--s-2);max-width:60ch;text-wrap:pretty}
 
 /* ---------- browse cards ---------- */
@@ -448,3 +448,24 @@ main>.wrap:has(.hero){padding-top:0}
 .page-search input::placeholder{color:var(--t3)}
 .page-search input:focus{outline:none}
 .page-noresults{color:var(--t3);font-size:15px;padding:8px 2px;display:none}
+
+/* ============================================================
+   DESKTOP TYPE SCALE — larger body + headings on wider screens.
+   Mobile sizes are left untouched; this only kicks in at >=768px.
+   ============================================================ */
+@media (min-width:768px){
+  body{font-size:20px}
+  /* body copy */
+  .sec-head .lead{font-size:20px}
+  .hero p{font-size:21px}
+  .card .desc,.a11y-desc{font-size:17px}
+  .app-card .app-desc{font-size:19px}
+  .exp-a{font-size:18px}
+  .res .rdesc,.res-help .rdesc{font-size:18px}
+  .gest .ghow{font-size:18px}
+  .cmp-topic,.cmp-val{font-size:18px}
+  /* secondary headings */
+  .card h3,.a11y-name{font-size:22px}
+  .app-card .app-name{font-size:20px}
+  .exp-title{font-size:20px}
+}
