@@ -185,26 +185,40 @@ async function sendChat(preset){
     addMsg('sys','The assistant is briefly unavailable. Please try again in a moment, or visit support.apple.com.');
   }
 }
-function openChat(){const w=document.getElementById('chatWindow');w.classList.add('open');w.setAttribute('aria-hidden','false');setMenu(false);setSearch(false);setTimeout(()=>document.getElementById('chatInput').focus(),120);}
+function openChat(){const w=document.getElementById('chatWindow');w.classList.add('open');w.setAttribute('aria-hidden','false');closeNav();setTimeout(()=>document.getElementById('chatInput').focus(),120);}
 function closeChat(){const w=document.getElementById('chatWindow');w.classList.remove('open');w.setAttribute('aria-hidden','true');}
 
-/* ---------- nav: menu sheet + search overlay ---------- */
-function setMenu(open){
-  const b=document.getElementById('menuBtn'),m=document.getElementById('menu'),s=document.getElementById('menuScrim');
-  if(!m)return;
-  if(b)b.setAttribute('aria-expanded',open);
-  m.classList.toggle('open',open);m.setAttribute('aria-hidden',!open);
-  if(s)s.classList.toggle('open',open);
-  if(open)setSearch(false);
+/* ---------- nav: slide-in panel ---------- */
+let navLastFocus=null;
+function navIsOpen(){return document.body.classList.contains('nav-open');}
+function resetNavSearch(){
+  const s=document.getElementById('navSearch'),p=document.getElementById('navPanel'),r=document.getElementById('navResults');
+  if(s)s.value='';if(p)p.classList.remove('nav-searching');if(r)r.innerHTML='';
 }
-function setSearch(open){
-  const b=document.getElementById('searchBtn'),pop=document.getElementById('searchPop');
-  if(!pop)return;
-  if(b)b.setAttribute('aria-expanded',open);
-  pop.classList.toggle('open',open);pop.setAttribute('aria-hidden',!open);
-  document.body.classList.toggle('search-open',open);
-  if(open){setMenu(false);setTimeout(()=>{const s=document.getElementById('search');if(s)s.focus();},100);}
-  else{const s=document.getElementById('search');if(s&&s.value){s.value='';runSearch('');}}
+function openNav(){
+  const toggle=document.getElementById('navToggle'),panel=document.getElementById('navPanel'),scrim=document.getElementById('navScrim');
+  if(!panel)return;
+  navLastFocus=document.activeElement;
+  resetNavSearch();
+  panel.hidden=false;if(scrim)scrim.hidden=false;
+  requestAnimationFrame(()=>document.body.classList.add('nav-open'));
+  if(toggle){toggle.setAttribute('aria-expanded','true');toggle.setAttribute('aria-label','Close menu');}
+  const fine=window.matchMedia('(pointer:fine)').matches;
+  const first=fine?document.getElementById('navSearch'):panel.querySelector('.nav-primary a');
+  if(first)setTimeout(()=>first.focus(),80);
+}
+function closeNav(){
+  const toggle=document.getElementById('navToggle'),panel=document.getElementById('navPanel'),scrim=document.getElementById('navScrim');
+  if(!panel)return;
+  document.body.classList.remove('nav-open');
+  if(toggle){toggle.setAttribute('aria-expanded','false');toggle.setAttribute('aria-label','Open menu');}
+  const onEnd=e=>{
+    if(e.target!==panel||e.propertyName!=='transform')return;
+    panel.removeEventListener('transitionend',onEnd);
+    if(!navIsOpen()){panel.hidden=true;if(scrim)scrim.hidden=true;}
+  };
+  panel.addEventListener('transitionend',onEnd);
+  if(navLastFocus&&navLastFocus.focus)navLastFocus.focus();
 }
 
 /* ---------- universal search (index across all pages) ---------- */
@@ -221,18 +235,18 @@ function buildIndex(){
   return idx;
 }
 let SEARCH_INDEX=[];
-function runSearch(q){
-  q=(q||'').trim().toLowerCase();
-  const box=document.getElementById('searchResults'),hint=document.getElementById('searchHint');
-  if(!box)return;
-  if(hint)hint.classList.toggle('hidden',!!q);
-  if(!q){box.innerHTML='';return;}
+function runNavSearch(q){
+  q=(q||'').trim();
+  const panel=document.getElementById('navPanel'),box=document.getElementById('navResults');
+  if(!box||!panel)return;
+  if(!q){panel.classList.remove('nav-searching');box.innerHTML='';return;}
+  panel.classList.add('nav-searching');
   const nq=matchable(q);
   const hits=SEARCH_INDEX.filter(it=>matchable(it.text).includes(nq)).slice(0,12);
-  if(!hits.length){box.innerHTML='<div class="sr-empty">No matches for &ldquo;'+esc(q)+'&rdquo;. Try the assistant.</div>';return;}
+  if(!hits.length){box.innerHTML='<div class="nav-no-results">No matches for &ldquo;'+esc(q)+'&rdquo;. Try Ask AI.</div>';return;}
   box.innerHTML=hits.map(h=>
-    '<a class="sr-item" href="'+esc(h.url)+'"'+(h.ext?' target="_blank" rel="noopener noreferrer"':'')+'>'
-    +'<span class="sr-cat">'+esc(h.cat)+'</span><span class="sr-title">'+esc(h.title)+'</span></a>'
+    '<a class="nav-result" href="'+esc(h.url)+'"'+(h.ext?' target="_blank" rel="noopener noreferrer"':'')+'>'
+    +'<span class="nav-r-title">'+esc(h.title)+'</span><span class="nav-r-cat">'+esc(h.cat)+'</span></a>'
   ).join('');
 }
 
@@ -267,7 +281,6 @@ function wireReveal(){
    CHROME INJECTION (header, footer, overlays) + wiring
    ============================================================ */
 const ICO_AGENT='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+ICONS.spark+'</svg>';
-const ICO_SEARCH='<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>';
 
 function injectChrome(activeKey){
   // favicon + theme-color (kept out of every shell head)
@@ -276,18 +289,14 @@ function injectChrome(activeKey){
     const l=document.createElement('link');l.rel='icon';l.href=fav;document.head.appendChild(l);
     const a=document.createElement('link');a.rel='apple-touch-icon';a.href=fav;document.head.appendChild(a);
   }
-  // Header
+  // Header: a single corner toggle that opens the overlay panel
   const header=document.getElementById('site-header');
   if(header){
-    header.className='site-header';
+    header.className='nav-bar';
     header.innerHTML=
-      '<a class="brand" href="index.html"><span class="brand-dot"></span> Mac Hub</a>'
-      +'<nav class="top-nav">'+NAV.map(n=>'<a href="'+n.url+'"'+(n.key===activeKey?' class="active"':'')+'>'+esc(n.label)+'</a>').join('')+'</nav>'
-      +'<div class="controls">'
-        +'<button class="ctrl-btn agent-btn" id="agentBtn" aria-label="Ask the AI assistant">'+ICO_AGENT+'</button>'
-        +'<button class="ctrl-btn search-btn" id="searchBtn" aria-label="Search" aria-expanded="false" aria-controls="searchPop">'+ICO_SEARCH+'</button>'
-        +'<button class="ctrl-btn menu-btn only-mobile" id="menuBtn" aria-label="Menu" aria-expanded="false" aria-controls="menu"><span class="bars" aria-hidden="true"><span></span><span></span><span></span></span></button>'
-      +'</div>';
+      '<button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navPanel" aria-label="Open menu">'
+        +'<span class="nav-bars" aria-hidden="true"><span></span><span></span></span>'
+      +'</button>';
   }
   // Footer
   const footer=document.getElementById('site-footer');
@@ -305,23 +314,26 @@ function injectChrome(activeKey){
   }
   // Overlays appended to body
   const overlays=document.createElement('div');
+  const navLinks=[{key:'home',url:'index.html',label:'Home'}].concat(NAV.map(n=>({key:n.key,url:n.url,label:n.label})));
   overlays.innerHTML=
-    // search overlay
-    '<div class="search-pop" id="searchPop" aria-hidden="true"><div class="search-bar"><div class="search-field">'
-    +'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>'
-    +'<input id="search" type="search" placeholder="Search the hub..." autocomplete="off"></div>'
-    +'<button class="search-cancel" id="searchCancel">Cancel</button></div>'
-    +'<p class="search-hint" id="searchHint">Search shortcuts, apps, answers, videos, and more.</p>'
-    +'<div class="search-results" id="searchResults"></div></div>'
-    // mobile menu sheet
-    +'<div class="menu-scrim" id="menuScrim" aria-hidden="true"></div>'
-    +'<nav class="menu" id="menu" aria-hidden="true">'
-      +'<button type="button" class="menu-action" id="menuAgent">'+ICO_AGENT+' Ask the assistant</button>'
-      +'<button type="button" class="menu-action" id="menuSearch">'+ICO_SEARCH+' Search</button>'
-      +'<span class="menu-divider" aria-hidden="true"></span>'
-      +'<a href="index.html" data-ico="grid">Home</a>'
-      +NAV.map(n=>'<a href="'+n.url+'" data-ico="'+n.ico+'"'+(n.key===activeKey?' class="active"':'')+'>'+esc(n.label)+'</a>').join('')
-    +'</nav>'
+    // nav scrim + slide-in panel
+    '<div class="nav-scrim" id="navScrim" hidden></div>'
+    +'<aside class="nav-panel" id="navPanel" role="dialog" aria-modal="true" aria-label="Site menu" hidden><nav>'
+      +'<div class="nav-search">'
+        +'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>'
+        +'<input id="navSearch" type="search" placeholder="Search Mac Hub" aria-label="Search Mac Hub" autocomplete="off"></div>'
+      +'<div class="nav-primary">'
+        +navLinks.map(n=>'<a href="'+n.url+'"'+(n.key===activeKey?' aria-current="page"':'')+'>'+esc(n.label)+'</a>').join('')
+      +'</div>'
+      +'<div class="nav-actions">'
+        +'<a href="mailto:'+esc(CONTENT.helpEmail)+'">Get Help</a>'
+        +'<button type="button" id="navAskAi">Ask AI</button>'
+      +'</div>'
+      +'<div class="nav-results" id="navResults" role="region" aria-label="Search results"></div>'
+      +'<div class="nav-foot"><a class="nav-lock" href="admin.html" aria-label="Admin">'
+        +'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>'
+      +'</a></div>'
+    +'</nav></aside>'
     // chat window
     +'<div class="chat-window" id="chatWindow" aria-hidden="true"><div class="chat-head">'
     +'<span class="ttl">'+ICO_AGENT+' Ask the Assistant</span>'
@@ -341,33 +353,32 @@ function injectChrome(activeKey){
     +'<div class="vm-inner"><div class="vm-frame" id="vmFrame"></div><div class="vm-title" id="vmTitle"></div></div></div>';
   while(overlays.firstChild)document.body.appendChild(overlays.firstChild);
 
-  // populate mobile-sheet link icons from the ICONS map
-  document.querySelectorAll('.menu a[data-ico]').forEach(a=>a.insertAdjacentHTML('afterbegin',svg(a.dataset.ico,19)));
-
   wireChrome();
 }
 
 function wireChrome(){
-  // controls
-  const menuBtn=document.getElementById('menuBtn');
-  const searchBtn=document.getElementById('searchBtn');
-  const agentBtn=document.getElementById('agentBtn');
-  if(menuBtn)menuBtn.addEventListener('click',e=>{e.stopPropagation();setMenu(menuBtn.getAttribute('aria-expanded')!=='true');});
-  if(searchBtn)searchBtn.addEventListener('click',e=>{e.stopPropagation();setSearch(searchBtn.getAttribute('aria-expanded')!=='true');});
-  if(agentBtn)agentBtn.addEventListener('click',()=>{document.getElementById('chatWindow').classList.contains('open')?closeChat():openChat();});
-
-  // menu sheet
-  document.getElementById('menuScrim').addEventListener('click',()=>setMenu(false));
-  document.getElementById('menuAgent').addEventListener('click',e=>{e.stopPropagation();setMenu(false);openChat();});
-  document.getElementById('menuSearch').addEventListener('click',e=>{e.stopPropagation();setMenu(false);setSearch(true);});
-
-  // search
   SEARCH_INDEX=buildIndex();
-  const searchInput=document.getElementById('search');
-  searchInput.addEventListener('input',e=>runSearch(e.target.value));
-  searchInput.addEventListener('keydown',e=>{if(e.key==='Escape'){searchInput.value='';runSearch('');setSearch(false);}});
-  document.getElementById('searchCancel').addEventListener('click',()=>setSearch(false));
-  document.getElementById('searchPop').addEventListener('click',e=>{if(e.target===e.currentTarget)setSearch(false);});
+
+  // nav panel open/close
+  const toggle=document.getElementById('navToggle');
+  if(toggle)toggle.addEventListener('click',()=>{navIsOpen()?closeNav():openNav();});
+  const scrim=document.getElementById('navScrim');
+  if(scrim)scrim.addEventListener('click',closeNav);
+
+  // panel search (universal, reuses the cross-page index)
+  const navSearch=document.getElementById('navSearch');
+  if(navSearch)navSearch.addEventListener('input',e=>runNavSearch(e.target.value));
+
+  // Ask AI -> open the assistant
+  const askAi=document.getElementById('navAskAi');
+  if(askAi)askAi.addEventListener('click',()=>{closeNav();openChat();});
+
+  // close the panel after following an in-site link
+  const panel=document.getElementById('navPanel');
+  if(panel)panel.addEventListener('click',e=>{
+    const a=e.target.closest('a');
+    if(a&&a.getAttribute('target')!=='_blank')closeNav();
+  });
 
   // chat
   document.getElementById('chatSend').onclick=()=>sendChat();
@@ -390,22 +401,17 @@ function wireChrome(){
     if(modal&&modal.classList.contains('open')&&e.target===modal)closeVideo();
   });
 
-  // global escape
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'){setMenu(false);setSearch(false);closeChat();closeVideo();}});
-
-  // swipe-to-dismiss the mobile sheet
-  wireSheetSwipe();
-}
-
-function wireSheetSwipe(){
-  const menuEl=document.getElementById('menu');if(!menuEl)return;
-  let startY=0,curY=0,dragging=false,t0=0;
-  const isSheet=()=>window.matchMedia('(max-width:560px)').matches;
-  const reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
-  function reset(snap){menuEl.style.transition=snap&&!reduce?'transform .22s ease':'';menuEl.style.transform=snap?'':'';}
-  menuEl.addEventListener('touchstart',e=>{if(!isSheet()||!menuEl.classList.contains('open'))return;startY=curY=e.touches[0].clientY;dragging=true;t0=Date.now();menuEl.style.transition='none';},{passive:true});
-  menuEl.addEventListener('touchmove',e=>{if(!dragging)return;curY=e.touches[0].clientY;const dy=Math.max(0,curY-startY);menuEl.style.transform='translateY('+dy+'px)';},{passive:true});
-  menuEl.addEventListener('touchend',()=>{if(!dragging)return;dragging=false;const dy=curY-startY,vel=dy/Math.max(1,Date.now()-t0);if(dy>80||(vel>0.5&&dy>40)){menuEl.style.transition='';setMenu(false);menuEl.style.transform='';}else{reset(true);}});
+  // global escape + focus trap for the panel
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){if(navIsOpen()){closeNav();return;}closeChat();closeVideo();return;}
+    if(e.key==='Tab'&&navIsOpen()){
+      const p=document.getElementById('navPanel');if(!p)return;
+      const f=[toggle].concat(Array.prototype.slice.call(p.querySelectorAll('a[href],button:not([disabled]),input')));
+      const i=f.indexOf(document.activeElement);
+      if(e.shiftKey){if(i<=0){e.preventDefault();f[f.length-1].focus();}}
+      else{if(i===f.length-1){e.preventDefault();f[0].focus();}}
+    }
+  });
 }
 
 /* ============================================================
