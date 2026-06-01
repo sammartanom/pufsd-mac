@@ -298,20 +298,6 @@ function injectChrome(activeKey){
         +'<span class="nav-bars" aria-hidden="true"><span></span><span></span></span>'
       +'</button>';
   }
-  // Footer
-  const footer=document.getElementById('site-footer');
-  if(footer){
-    footer.outerHTML=
-      '<footer class="site-footer">'
-      +'<div class="foot-main"><div class="foot-brand">'
-        +'<span class="foot-title">Your Mac, made simple<span class="dot">.</span></span>'
-        +'<span class="foot-sub">Pleasantville Union Free School District &middot; Technology Department</span></div>'
-      +'<div class="foot-links"><button type="button" class="foot-help" id="footHelpBtn"><span class="foot-help-label">Copy Help Desk email</span><span class="foot-help-done">Copied!</span></button></div></div>'
-      +'<div class="foot-meta"><span>For Pleasantville students and staff</span><span id="footUpdated"></span></div>'
-      +'</footer>';
-    const fu=document.getElementById('footUpdated');
-    if(fu)fu.textContent='Updated '+new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'});
-  }
   // Overlays appended to body
   const overlays=document.createElement('div');
   const navLinks=[{key:'home',url:'index.html',label:'Home'}].concat(NAV.map(n=>({key:n.key,url:n.url,label:n.label})));
@@ -386,9 +372,8 @@ function wireChrome(){
   document.querySelectorAll('.chat-chip').forEach(c=>c.addEventListener('click',()=>sendChat(c.textContent)));
   document.getElementById('chatClose').addEventListener('click',closeChat);
 
-  // help-desk copy (event delegation; works for footer + resources card)
+  // help-desk copy on the resources page card
   document.addEventListener('click',e=>{
-    if(e.target.closest&&e.target.closest('#footHelpBtn'))copyTo('footHelpBtn');
     if(e.target.closest&&e.target.closest('#helpBtn'))copyTo('helpBtn');
   });
 
