@@ -1,0 +1,133 @@
+/* ============================================================
+   Mac Hub navigation
+   Pairs with nav.js. All classes are namespaced "mh-" so they
+   will not collide with anything already in styles.css.
+
+   To match your design system exactly, point these tokens at
+   your real ones, e.g.  --mh-card: var(--card);
+   ============================================================ */
+:root{
+  --mh-card:#161616;        /* panel + toggle fill */
+  --mh-card-hover:#1f1f1f;
+  --mh-raise:#202020;       /* search field + lock hover */
+  --mh-text:#fff;
+  --mh-muted:rgba(255,255,255,.46);
+  --mh-faint:rgba(255,255,255,.3);
+  --mh-mint:#5eea8e;
+  --mh-line:rgba(255,255,255,.1);
+  --mh-ease:cubic-bezier(.2,.7,.3,1);
+}
+
+body.mh-menu-open{overflow:hidden}
+
+/* fixed top bar: trigger only, equidistant from top and right */
+.mh-bar{
+  position:fixed;inset:0 0 auto 0;z-index:1060;
+  display:flex;align-items:center;justify-content:flex-end;
+  padding:24px;pointer-events:none;
+}
+.mh-toggle{
+  pointer-events:auto;position:relative;
+  width:52px;height:52px;border-radius:50%;
+  background:var(--mh-card);border:0;
+  cursor:pointer;transition:background .2s ease;
+  display:grid;place-items:center;
+}
+.mh-toggle:hover{background:var(--mh-card-hover)}
+.mh-toggle:focus-visible{outline:2px solid var(--mh-mint);outline-offset:3px}
+.mh-bars{position:relative;width:20px;height:20px}
+.mh-bars span{
+  position:absolute;left:50%;top:50%;width:18px;height:1.6px;border-radius:2px;
+  background:var(--mh-text);transform-origin:center;
+  transition:transform .34s var(--mh-ease);
+}
+.mh-bars span:nth-child(1){transform:translate(-50%,-50%) rotate(0deg)}
+.mh-bars span:nth-child(2){transform:translate(-50%,-50%) rotate(90deg)}
+body.mh-menu-open .mh-bars span:nth-child(1){transform:translate(-50%,-50%) rotate(45deg)}
+body.mh-menu-open .mh-bars span:nth-child(2){transform:translate(-50%,-50%) rotate(-45deg)}
+
+/* scrim */
+.mh-scrim{
+  position:fixed;inset:0;z-index:1040;background:rgba(0,0,0,.4);
+  opacity:0;visibility:hidden;transition:opacity .3s ease,visibility .3s ease;
+}
+body.mh-menu-open .mh-scrim{opacity:1;visibility:visible}
+
+/* panel: solid card color, no border, slides in from the right */
+.mh-panel{
+  position:fixed;top:0;right:0;z-index:1050;
+  height:100dvh;width:min(420px,100%);
+  background:var(--mh-card);
+  padding:108px 33px 33px 56px;
+  display:flex;flex-direction:column;
+  transform:translateX(100%);
+  transition:transform .44s var(--mh-ease);
+  overflow-y:auto;
+}
+body.mh-menu-open .mh-panel{transform:translateX(0)}
+.mh-panel nav{flex:1;display:flex;flex-direction:column}
+
+/* universal search, pinned at the top of the panel */
+.mh-search{
+  display:flex;align-items:center;gap:10px;
+  background:var(--mh-raise);border-radius:12px;padding:12px 14px;margin-bottom:30px;
+}
+.mh-search:focus-within{outline:2px solid var(--mh-mint);outline-offset:2px}
+.mh-search svg{width:18px;height:18px;color:var(--mh-muted);flex:none}
+.mh-search input{flex:1;min-width:0;background:none;border:0;outline:none;color:var(--mh-text);font:inherit;font-size:16px}
+.mh-search input::placeholder{color:var(--mh-muted)}
+
+/* page links + action items share one type treatment */
+.mh-primary{display:flex;flex-direction:column;gap:10px}
+.mh-primary a,.mh-actions a,.mh-actions button{
+  display:block;text-align:left;text-decoration:none;color:var(--mh-text);
+  background:none;border:0;padding:0;cursor:pointer;
+  font-family:inherit;font-weight:500;font-size:clamp(28px,2.9vw,40px);line-height:1.16;
+  letter-spacing:-.022em;text-wrap:balance;
+  width:max-content;max-width:100%;
+  transition:color .22s ease;
+}
+.mh-primary a:hover,.mh-actions a:hover,.mh-actions button:hover{color:var(--mh-muted)}   /* hover dims */
+.mh-primary a:focus-visible,.mh-actions a:focus-visible,.mh-actions button:focus-visible{outline:2px solid var(--mh-mint);outline-offset:4px;border-radius:2px}
+.mh-primary a[aria-current="page"]{color:var(--mh-mint)}                                   /* active is color only, no border */
+.mh-primary a[aria-current="page"]:hover{color:rgba(94,234,142,.62)}
+
+/* divider, then the action items (Get Help, Ask AI) */
+.mh-actions{
+  display:flex;flex-direction:column;gap:10px;
+  margin-top:22px;padding-top:22px;border-top:1px solid var(--mh-line);
+}
+
+/* search results */
+.mh-results{display:none;flex-direction:column}
+.mh-result{display:block;text-decoration:none;padding:12px 0;border-bottom:1px solid var(--mh-line)}
+.mh-result:first-child{padding-top:0}
+.mh-result:last-child{border-bottom:0}
+.mh-result .mh-r-title{display:block;color:var(--mh-text);font-size:20px;font-weight:500;transition:color .2s ease}
+.mh-result .mh-r-page{display:block;color:var(--mh-muted);font-size:13px;margin-top:3px}
+.mh-result:hover .mh-r-title{color:var(--mh-muted)}
+.mh-result:focus-visible{outline:2px solid var(--mh-mint);outline-offset:2px;border-radius:2px}
+.mh-no-results{color:var(--mh-muted);font-size:15px;padding:6px 0}
+
+.mh-panel.mh-searching .mh-primary,
+.mh-panel.mh-searching .mh-actions{display:none}
+.mh-panel.mh-searching .mh-results{display:flex}
+
+/* lock, mirrored under the trigger */
+.mh-bottom{margin-top:auto;display:flex;justify-content:flex-end}
+.mh-lock{
+  display:inline-grid;place-items:center;width:34px;height:34px;border-radius:8px;
+  color:var(--mh-faint);text-decoration:none;transition:color .2s ease,background .2s ease;
+}
+.mh-lock:hover{color:var(--mh-text);background:var(--mh-raise)}
+.mh-lock:focus-visible{outline:2px solid var(--mh-mint);outline-offset:2px}
+.mh-lock svg{width:18px;height:18px}
+
+@media (max-width:600px){
+  .mh-bar{padding:16px}
+  .mh-panel{padding:104px 25px 25px 28px}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .mh-bars span,.mh-scrim,.mh-panel,.mh-lock,.mh-result .mh-r-title{transition-duration:.001ms !important}
+}
