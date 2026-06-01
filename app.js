@@ -185,8 +185,32 @@ async function sendChat(preset){
     addMsg('sys','The assistant is briefly unavailable. Please try again in a moment, or visit support.apple.com.');
   }
 }
-function openChat(){const w=document.getElementById('chatWindow');w.classList.add('open');w.setAttribute('aria-hidden','false');closeNav();setTimeout(()=>document.getElementById('chatInput').focus(),120);}
-function closeChat(){const w=document.getElementById('chatWindow');w.classList.remove('open');w.setAttribute('aria-hidden','true');}
+/* ---------- AI assistant: slide-in panel (mirrors the nav) ---------- */
+let aiLastFocus=null;
+function aiIsOpen(){return document.body.classList.contains('ai-open');}
+function openChat(){
+  const toggle=document.getElementById('aiToggle'),panel=document.getElementById('aiPanel'),scrim=document.getElementById('aiScrim');
+  if(!panel)return;
+  if(navIsOpen())closeNav();
+  aiLastFocus=document.activeElement;
+  panel.hidden=false;if(scrim)scrim.hidden=false;
+  requestAnimationFrame(()=>document.body.classList.add('ai-open'));
+  if(toggle){toggle.setAttribute('aria-expanded','true');toggle.setAttribute('aria-label','Close assistant');}
+  setTimeout(()=>{const i=document.getElementById('chatInput');if(i)i.focus();},120);
+}
+function closeChat(){
+  const toggle=document.getElementById('aiToggle'),panel=document.getElementById('aiPanel'),scrim=document.getElementById('aiScrim');
+  if(!panel)return;
+  document.body.classList.remove('ai-open');
+  if(toggle){toggle.setAttribute('aria-expanded','false');toggle.setAttribute('aria-label','Ask AI');}
+  const onEnd=e=>{
+    if(e.target!==panel||e.propertyName!=='transform')return;
+    panel.removeEventListener('transitionend',onEnd);
+    if(!aiIsOpen()){panel.hidden=true;if(scrim)scrim.hidden=true;}
+  };
+  panel.addEventListener('transitionend',onEnd);
+  if(aiLastFocus&&aiLastFocus.focus)aiLastFocus.focus();
+}
 
 /* ---------- nav: slide-in panel ---------- */
 let navLastFocus=null;
@@ -198,6 +222,7 @@ function resetNavSearch(){
 function openNav(){
   const toggle=document.getElementById('navToggle'),panel=document.getElementById('navPanel'),scrim=document.getElementById('navScrim');
   if(!panel)return;
+  if(aiIsOpen())closeChat();
   navLastFocus=document.activeElement;
   resetNavSearch();
   panel.hidden=false;if(scrim)scrim.hidden=false;
@@ -320,19 +345,24 @@ function injectChrome(activeKey){
         +'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>'
       +'</a></div>'
     +'</nav></aside>'
-    // chat window
-    +'<div class="chat-window" id="chatWindow" aria-hidden="true"><div class="chat-head">'
-    +'<span class="ttl">'+ICO_AGENT+' Ask the Assistant</span>'
-    +'<button class="x" id="chatClose" aria-label="Close">&times;</button></div>'
-    +'<div class="chat-log" id="chatLog"><div class="msg sys">Ask anything about using your MacBook or iPad. Answers are grounded in Apple Support and Pleasantville district guidance.</div>'
-    +'<div class="chat-chips" id="chatChips">'
-      +'<button type="button" class="chat-chip">How do I take a screenshot?</button>'
-      +'<button type="button" class="chat-chip">How do I install an app?</button>'
-      +'<button type="button" class="chat-chip">Where should I save my schoolwork?</button>'
-      +'<button type="button" class="chat-chip">How do I connect to Wi-Fi?</button>'
-    +'</div></div>'
-    +'<div class="chat-input"><div class="chat-field"><textarea id="chatInput" placeholder="How do I take a screenshot?"></textarea></div>'
-    +'<button class="cta" id="chatSend">Send</button></div></div>'
+    // AI assistant: bottom-corner toggle + scrim + slide-in panel (mirrors the nav)
+    +'<div class="ai-bar"><button class="ai-toggle" id="aiToggle" aria-expanded="false" aria-controls="aiPanel" aria-label="Ask AI">'
+      +'<span class="ai-ico ai-ico-spark" aria-hidden="true">'+ICO_AGENT+'</span>'
+      +'<span class="ai-ico ai-ico-x" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></svg></span>'
+    +'</button></div>'
+    +'<div class="ai-scrim" id="aiScrim" hidden></div>'
+    +'<aside class="ai-panel" id="aiPanel" role="dialog" aria-modal="true" aria-label="AI assistant" hidden><div class="ai-inner">'
+      +'<div class="ai-head"><span class="ai-title">Ask AI</span><span class="ai-sub">Answers grounded in Apple Support and Pleasantville district guidance.</span></div>'
+      +'<div class="chat-log" id="chatLog"><div class="msg sys">Ask anything about using your MacBook or iPad.</div>'
+      +'<div class="chat-chips" id="chatChips">'
+        +'<button type="button" class="chat-chip">How do I take a screenshot?</button>'
+        +'<button type="button" class="chat-chip">How do I install an app?</button>'
+        +'<button type="button" class="chat-chip">Where should I save my schoolwork?</button>'
+        +'<button type="button" class="chat-chip">How do I connect to Wi-Fi?</button>'
+      +'</div></div>'
+      +'<div class="chat-input"><div class="chat-field"><textarea id="chatInput" placeholder="How do I take a screenshot?"></textarea></div>'
+      +'<button class="cta" id="chatSend">Send</button></div>'
+    +'</div></aside>'
     // video modal
     +'<div class="video-modal" id="videoModal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Video player">'
     +'<button type="button" class="vm-close" id="vmClose" aria-label="Close video"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>'
@@ -370,7 +400,12 @@ function wireChrome(){
   document.getElementById('chatSend').onclick=()=>sendChat();
   document.getElementById('chatInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}});
   document.querySelectorAll('.chat-chip').forEach(c=>c.addEventListener('click',()=>sendChat(c.textContent)));
-  document.getElementById('chatClose').addEventListener('click',closeChat);
+
+  // AI panel open/close (bottom-corner toggle mirrors the nav)
+  const aiToggle=document.getElementById('aiToggle');
+  if(aiToggle)aiToggle.addEventListener('click',()=>{aiIsOpen()?closeChat():openChat();});
+  const aiScrim=document.getElementById('aiScrim');
+  if(aiScrim)aiScrim.addEventListener('click',closeChat);
 
   // help-desk copy on the resources page card
   document.addEventListener('click',e=>{
@@ -386,17 +421,22 @@ function wireChrome(){
     if(modal&&modal.classList.contains('open')&&e.target===modal)closeVideo();
   });
 
-  // global escape + focus trap for the panel
+  // global escape + focus trap (nav + AI panels share the pattern)
   document.addEventListener('keydown',e=>{
-    if(e.key==='Escape'){if(navIsOpen()){closeNav();return;}closeChat();closeVideo();return;}
-    if(e.key==='Tab'&&navIsOpen()){
-      const p=document.getElementById('navPanel');if(!p)return;
-      const f=[toggle].concat(Array.prototype.slice.call(p.querySelectorAll('a[href],button:not([disabled]),input')));
-      const i=f.indexOf(document.activeElement);
-      if(e.shiftKey){if(i<=0){e.preventDefault();f[f.length-1].focus();}}
-      else{if(i===f.length-1){e.preventDefault();f[0].focus();}}
+    if(e.key==='Escape'){if(navIsOpen()){closeNav();return;}if(aiIsOpen()){closeChat();return;}closeVideo();return;}
+    if(e.key==='Tab'){
+      if(navIsOpen())trapTab(e,document.getElementById('navPanel'),toggle);
+      else if(aiIsOpen())trapTab(e,document.getElementById('aiPanel'),aiToggle);
     }
   });
+}
+
+function trapTab(e,panel,trigger){
+  if(!panel)return;
+  const f=[trigger].concat(Array.prototype.slice.call(panel.querySelectorAll('a[href],button:not([disabled]),input,textarea')));
+  const i=f.indexOf(document.activeElement);
+  if(e.shiftKey){if(i<=0){e.preventDefault();f[f.length-1].focus();}}
+  else{if(i===f.length-1){e.preventDefault();f[0].focus();}}
 }
 
 /* ============================================================

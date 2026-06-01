@@ -43,7 +43,7 @@ html,body{
 }
 body{position:relative;font-size:18px;line-height:1.55;letter-spacing:-0.01px;min-height:100vh;text-rendering:optimizeLegibility;overflow-x:hidden;text-wrap:pretty}
 /* page titles stay bold; card headings sit at 500 */
-.hero h1,.sec-head h2,.chat-head .ttl,.gate h2,.admin-head h2{font-variation-settings:"opsz" 32,"wght" 560}
+.hero h1,.sec-head h2,.gate h2,.admin-head h2{font-variation-settings:"opsz" 32,"wght" 560}
 .card h3,.cmp-topic,.exp-title,.app-card .app-name,.res .rname,.res-help .rname,.gest .gname{font-variation-settings:"opsz" 28,"wght" 460;font-weight:460}
 input,textarea,button,select{font-feature-settings:inherit}
 a{color:inherit;text-decoration:none;transition:opacity .22s var(--ease)}
@@ -340,18 +340,37 @@ section{padding:var(--s-8) 0}
 .doc-link:hover svg,.app-card a.app-link:hover svg{transform:translate(2px,-2px)}
 
 /* ---------- agent chat window (overlay) ---------- */
-.chat-window{position:fixed;top:calc(var(--s-6) + 64px);right:var(--s-6);z-index:202;width:min(400px,calc(100vw - var(--s-6)*2));height:min(620px,calc(100vh - 130px));background:#1a1a1a;border-radius:var(--rc);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.5);opacity:0;transform:translateY(-12px) scale(.98);transform-origin:top right;pointer-events:none;transition:opacity .24s var(--ease),transform .4s var(--ease-spring)}
-.chat-window.open{opacity:1;transform:none;pointer-events:auto}
-.chat-head{display:flex;align-items:center;justify-content:space-between;padding:var(--pad-row);flex-shrink:0}
-.chat-head .ttl{display:flex;align-items:center;gap:10px;font-weight:460;color:var(--t1);letter-spacing:-0.01px}
-.chat-head .ttl svg{color:var(--accent)}
-.chat-log{flex:1;overflow-y:auto;padding:var(--s-4) var(--s-5);display:flex;flex-direction:column;gap:var(--s-3)}
-.msg{max-width:85%;padding:11px 15px;border-radius:14px;font-size:15px;line-height:1.5}
+/* ---------- AI assistant: bottom-corner toggle + slide-in panel (mirrors the nav) ---------- */
+.ai-bar{position:fixed;inset:auto 0 0 auto;z-index:130;display:flex;align-items:center;justify-content:flex-end;padding:24px;pointer-events:none}
+.ai-toggle{pointer-events:auto;position:relative;width:52px;height:52px;border-radius:50%;background:var(--bg-card);color:var(--t1);display:grid;place-items:center;cursor:pointer;transition:background .24s var(--ease)}
+.ai-toggle:hover{background:var(--glass-card-hover)}
+.ai-toggle .ai-ico{position:absolute;display:grid;place-items:center;transition:opacity .26s var(--ease),transform .26s var(--ease)}
+.ai-toggle .ai-ico-spark{color:var(--accent)}
+.ai-toggle .ai-ico-x{opacity:0;transform:scale(.6) rotate(-30deg)}
+body.ai-open .ai-toggle .ai-ico-spark{opacity:0;transform:scale(.6) rotate(30deg)}
+body.ai-open .ai-toggle .ai-ico-x{opacity:1;transform:none;color:var(--t1)}
+/* keep the two corner controls from colliding: hide the opposite trigger while a panel is open */
+body.nav-open .ai-bar{opacity:0;visibility:hidden;transition:opacity .2s var(--ease),visibility .2s var(--ease)}
+body.ai-open .nav-bar{opacity:0;visibility:hidden;transition:opacity .2s var(--ease),visibility .2s var(--ease)}
+
+.ai-scrim{position:fixed;inset:0;z-index:110;background:rgba(0,0,0,.4);opacity:0;visibility:hidden;transition:opacity .3s var(--ease),visibility .3s var(--ease)}
+body.ai-open .ai-scrim{opacity:1;visibility:visible}
+
+.ai-panel{position:fixed;top:0;right:0;z-index:120;height:100dvh;width:min(460px,100%);background:var(--bg-card);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .44s var(--ease-spring);overflow:hidden}
+body.ai-open .ai-panel{transform:translateX(0)}
+/* top padding clears nothing; generous bottom padding clears the bottom-right toggle (mirror of the nav's top clearance) */
+.ai-inner{flex:1;display:flex;flex-direction:column;min-height:0;padding:52px 33px 104px 56px}
+.ai-head{flex-shrink:0;margin-bottom:var(--s-4)}
+.ai-title{display:block;font-size:27px;font-weight:500;letter-spacing:-.018em;color:var(--t1)}
+.ai-sub{display:block;margin-top:6px;font-size:14px;line-height:1.45;color:var(--t3);max-width:34ch}
+
+.chat-log{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:var(--s-3);padding-right:4px}
+.msg{max-width:88%;padding:11px 15px;border-radius:14px;font-size:15px;line-height:1.5}
 .msg.user{align-self:flex-end;background:var(--surface-2);color:var(--t1)}
-.msg.bot{align-self:flex-start;background:#242424;color:var(--t1)}
-.msg.sys{align-self:center;color:var(--t3);font-size:13.5px;text-align:center;max-width:92%}
-.chat-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px}
-.chat-chip{font:inherit;font-size:13.5px;color:var(--t2);background:#242424;border:1px solid var(--rule);border-radius:999px;padding:7px 13px;cursor:pointer;transition:color .2s var(--ease),background .2s var(--ease),border-color .2s var(--ease)}
+.msg.bot{align-self:flex-start;background:var(--glass-card);color:var(--t1)}
+.msg.sys{align-self:flex-start;color:var(--t3);font-size:13.5px;max-width:100%}
+.chat-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:var(--s-3)}
+.chat-chip{font:inherit;font-size:13.5px;color:var(--t2);background:var(--glass-card);border:1px solid var(--rule);border-radius:999px;padding:7px 13px;cursor:pointer;transition:color .2s var(--ease),background .2s var(--ease),border-color .2s var(--ease)}
 .chat-chip:hover{color:var(--t1);background:var(--surface-2);border-color:var(--t3)}
 .msg.typing{display:inline-flex;align-items:center;gap:5px;padding:14px 16px}
 .msg.typing .dot{width:7px;height:7px;border-radius:50%;background:var(--t3);animation:typingBlink 1.3s infinite ease-in-out}
@@ -359,8 +378,8 @@ section{padding:var(--s-8) 0}
 .msg.typing .dot:nth-child(3){animation-delay:.36s}
 @keyframes typingBlink{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
 @media (prefers-reduced-motion:reduce){.msg.typing .dot{animation:none;opacity:.6}}
-.chat-input{display:flex;align-items:flex-end;gap:var(--s-3);padding:var(--s-4);flex-shrink:0}
-.chat-field{flex:1;display:flex;border-radius:var(--rs);background:#222;box-shadow:inset 0 0 0 1px var(--rule);transition:box-shadow .24s var(--ease)}
+.chat-input{display:flex;align-items:flex-end;gap:var(--s-3);padding-top:var(--s-4);flex-shrink:0}
+.chat-field{flex:1;display:flex;border-radius:var(--rs);background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--rule);transition:box-shadow .24s var(--ease)}
 .chat-field:focus-within{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.4)}
 .chat-field textarea{width:100%;resize:none;background:transparent;border:none;color:var(--t1);font:inherit;font-size:15px;line-height:22px;padding:13px 16px;height:48px;min-height:48px;max-height:120px;display:block}
 .chat-field textarea:focus{outline:none}
@@ -372,10 +391,13 @@ section{padding:var(--s-8) 0}
 .cta:active{transform:scale(.985)}
 .cta.alt{background:transparent;color:var(--t2)}
 .cta.alt:hover{color:var(--t1);background:var(--surface-2)}
-@media (max-width:560px){
-  .chat-window{top:0;left:0;right:0;bottom:0;width:auto;height:auto;border-radius:0;transform:translateY(100%);transform-origin:bottom;box-shadow:none;padding-top:env(safe-area-inset-top)}
-  .chat-window.open{transform:none}
-  .chat-head{padding:18px 20px;box-shadow:inset 0 -1px 0 var(--rule-faint)}
+@media (max-width:600px){
+  .ai-bar{padding:16px}
+  .ai-panel{width:100%}
+  .ai-inner{padding:48px 25px 96px 28px}
+}
+@media (prefers-reduced-motion:reduce){
+  .ai-toggle .ai-ico,.ai-scrim,.ai-panel{transition-duration:.001ms !important}
 }
 
 /* ---------- admin ---------- */
