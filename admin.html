@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0a0a0a">
+<title>Content Editor — Mac Hub</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="styles.css">
+<style>
+/* editor-only styles (kept here so the shared sheet stays page-facing) */
+.adm-wrap{max-width:900px;margin:0 auto;padding:0 var(--gutter)}
+.adm-head{display:flex;align-items:center;gap:var(--s-3);flex-wrap:wrap;padding:var(--s-6) 0 var(--s-5)}
+.adm-head h1{font-size:clamp(24px,3.5vw,32px);font-weight:560;letter-spacing:-0.01px}
+.adm-head .spacer{flex:1}
+.adm-note{color:var(--t3);font-size:14px;margin:-8px 0 var(--s-5);line-height:1.5}
+.adm-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:var(--s-5)}
+.adm-tab{font:inherit;font-size:14px;font-weight:460;color:var(--t2);background:var(--glass-card);border:1px solid var(--rule);border-radius:999px;padding:7px 14px;cursor:pointer;transition:color .2s,background .2s}
+.adm-tab:hover{color:var(--t1)}
+.adm-tab.active{color:#000;background:var(--t1);border-color:var(--t1)}
+.adm-rows{display:flex;flex-direction:column;gap:var(--s-3)}
+.adm-row{background:var(--glass-card);border:1px solid var(--rule);border-radius:var(--ri);padding:var(--s-4)}
+.adm-row-head{display:flex;align-items:center;gap:var(--s-3);margin-bottom:var(--s-3)}
+.adm-row-head .idx{color:var(--t3);font-size:13px;font-variant-numeric:tabular-nums}
+.adm-row-head .title{flex:1;color:var(--t1);font-size:15px;font-weight:460;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.adm-field{margin-bottom:var(--s-3)}
+.adm-field:last-child{margin-bottom:0}
+.adm-field label{display:block;color:var(--t3);font-size:12px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.adm-field input,.adm-field textarea,.adm-field select{width:100%;background:var(--input-bg,#1a1a1a);border:1px solid var(--rule);border-radius:var(--rs);color:var(--t1);font:inherit;font-size:14.5px;padding:10px 12px}
+.adm-field textarea{resize:vertical;min-height:64px;line-height:1.45}
+.adm-field input:focus,.adm-field textarea:focus,.adm-field select:focus{outline:none;border-color:rgba(255,255,255,.4)}
+.adm-btn{font:inherit;font-size:14px;font-weight:460;border-radius:var(--rs);padding:9px 15px;cursor:pointer;transition:background .2s,color .2s;white-space:nowrap}
+.adm-btn.ghost{background:var(--glass-card);color:var(--t1);border:1px solid var(--rule)}
+.adm-btn.ghost:hover{background:var(--glass-card-hover)}
+.adm-btn.primary{background:var(--t1);color:#000;border:1px solid var(--t1)}
+.adm-btn.primary:hover{background:rgba(255,255,255,.85)}
+.adm-btn.danger{background:transparent;color:var(--t3);border:1px solid var(--rule)}
+.adm-btn.danger:hover{color:#ff7a6e;border-color:rgba(255,122,110,.4)}
+.adm-rowbtns{display:flex;gap:8px;justify-content:flex-end;margin-top:var(--s-3)}
+.adm-add{margin-top:var(--s-4)}
+.adm-export{margin:var(--s-6) 0 var(--s-8)}
+.adm-export textarea{width:100%;min-height:200px;background:#141414;border:1px solid var(--rule);border-radius:var(--ri);color:var(--t2);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;line-height:1.5;padding:14px;resize:vertical}
+.adm-export-head{display:flex;align-items:center;gap:var(--s-3);margin-bottom:var(--s-3);flex-wrap:wrap}
+.adm-export-head h2{font-size:18px;font-weight:560}
+.adm-meta-grid{display:grid;gap:var(--s-3)}
+.adm-flash{color:var(--accent);font-size:14px;font-weight:460;opacity:0;transition:opacity .2s}
+.adm-flash.show{opacity:1}
+</style>
+</head>
+<body>
+<div id="site-header"></div>
+<main>
+  <div class="adm-wrap">
+    <div class="adm-head">
+      <h1>Content Editor</h1>
+      <span class="spacer"></span>
+      <button type="button" class="adm-btn primary" id="exportBtn">Copy updated content.js</button>
+    </div>
+    <p class="adm-note">Edit any section below, then click <strong>Copy updated content.js</strong>. Paste the result over your <code>content.js</code> file on GitHub and commit. Nothing saves automatically &mdash; this keeps your content in version control with no database. This page is not linked from the site and is set to noindex.</p>
+    <div class="adm-tabs" id="admTabs"></div>
+    <div id="admBody"></div>
+    <div class="adm-export">
+      <div class="adm-export-head">
+        <h2>content.js output</h2>
+        <button type="button" class="adm-btn ghost" id="copyOut">Copy</button>
+        <span class="adm-flash" id="flash">Copied</span>
+      </div>
+      <textarea id="output" readonly spellcheck="false" placeholder="Click &quot;Copy updated content.js&quot; to generate the file text here."></textarea>
+    </div>
+  </div>
+</main>
+<div id="site-footer"></div>
+<script src="content.js"></script>
+<script src="app.js"></script>
+<script>
+/* ---- editor schema: which fields each section exposes ---- */
+const A11Y_ICONS=['zoom','text','dictate','speak','motion','color','access'];
+const APP_ICON_KEYS=Object.keys(APP_ICONS);
+const SCHEMA={
+  meta:[['title','Title','text'],['tagline','Tagline','area']],
+  switch:[['topic','Task','text'],['win','On Windows','text'],['mac','On a Mac','area']],
+  gestures:[['name','Gesture','text'],['how','How to do it','text'],['ico','Icon key','text'],['doc','Doc URL','text']],
+  apps:[['name','Name','text'],['icon','Icon',APP_ICON_KEYS],['desc','Description','area'],['url','URL','text']],
+  accessibility:[['name','Name','text'],['ico','Icon',A11Y_ICONS],['desc','Description','area'],['url','Doc URL','text']],
+  videos:[['title','Title','text'],['yt','YouTube ID','text'],['duration','Duration','text']],
+  faq:[['q','Question','text'],['a','Answer','area']],
+  resources:[['rname','Name','text'],['rdesc','Description','text'],['url','URL','text']]
+};
+const TAB_LABELS={meta:'Home / Meta',switch:'Windows vs. Mac',shortcuts:'Shortcuts',gestures:'Gestures',apps:'Apps',accessibility:'Accessibility',videos:'Videos',faq:'FAQ',resources:'Resources'};
+const TABS=['meta','switch','shortcuts','gestures','apps','accessibility','videos','faq','resources'];
+
+/* working copy of the data (deep clone so edits are isolated until export) */
+const DATA=JSON.parse(JSON.stringify(CONTENT));
+let activeTab='meta';
+
+function field(label,name,type,value,onInput){
+  const wrap=document.createElement('div');wrap.className='adm-field';
+  const lab=document.createElement('label');lab.textContent=label;wrap.appendChild(lab);
+  let input;
+  if(Array.isArray(type)){
+    input=document.createElement('select');
+    type.forEach(opt=>{const o=document.createElement('option');o.value=opt;o.textContent=opt;if(opt===value)o.selected=true;input.appendChild(o);});
+  }else if(type==='area'){
+    input=document.createElement('textarea');input.value=value||'';
+  }else{
+    input=document.createElement('input');input.type='text';input.value=value||'';
+  }
+  input.addEventListener('input',()=>onInput(input.value));
+  if(input.tagName==='SELECT')input.addEventListener('change',()=>onInput(input.value));
+  wrap.appendChild(input);
+  return wrap;
+}
+
+function drawMeta(){
+  const body=document.getElementById('admBody');body.innerHTML='';
+  const card=document.createElement('div');card.className='adm-row';
+  const grid=document.createElement('div');grid.className='adm-meta-grid';
+  SCHEMA.meta.forEach(([k,label,type])=>{
+    grid.appendChild(field(label,k,type,DATA.meta[k],v=>DATA.meta[k]=v));
+  });
+  card.appendChild(grid);body.appendChild(card);
+}
+
+function drawShortcuts(){
+  const body=document.getElementById('admBody');body.innerHTML='';
+  const note=document.createElement('p');note.className='adm-note';
+  note.innerHTML='Shortcuts are grouped. Each item has a label and its keys (comma-separated, e.g. <code>&#8984;, C</code>).';
+  body.appendChild(note);
+  DATA.shortcuts.forEach((grp,gi)=>{
+    const gcard=document.createElement('div');gcard.className='adm-row';
+    gcard.appendChild(field('Group name','group','text',grp.group,v=>grp.group=v));
+    grp.items.forEach((it,ii)=>{
+      const sub=document.createElement('div');sub.style.cssText='border-top:1px solid var(--rule);padding-top:12px;margin-top:12px';
+      sub.appendChild(field('Label','label','text',it.label,v=>it.label=v));
+      sub.appendChild(field('Keys (comma-separated)','keys','text',it.keys.join(', '),v=>it.keys=v.split(',').map(s=>s.trim()).filter(Boolean)));
+      const btns=document.createElement('div');btns.className='adm-rowbtns';
+      const del=document.createElement('button');del.className='adm-btn danger';del.textContent='Delete';
+      del.onclick=()=>{grp.items.splice(ii,1);drawShortcuts();};
+      btns.appendChild(del);sub.appendChild(btns);gcard.appendChild(sub);
+    });
+    const add=document.createElement('button');add.className='adm-btn ghost adm-add';add.textContent='+ Add shortcut';
+    add.onclick=()=>{grp.items.push({label:'New shortcut',keys:['\u2318','?']});drawShortcuts();};
+    gcard.appendChild(add);body.appendChild(gcard);
+  });
+}
+
+function drawList(tab){
+  const body=document.getElementById('admBody');body.innerHTML='';
+  const schema=SCHEMA[tab];const arr=DATA[tab];
+  const rows=document.createElement('div');rows.className='adm-rows';
+  arr.forEach((item,i)=>{
+    const card=document.createElement('div');card.className='adm-row';
+    const head=document.createElement('div');head.className='adm-row-head';
+    const idx=document.createElement('span');idx.className='idx';idx.textContent='#'+(i+1);
+    const title=document.createElement('span');title.className='title';
+    title.textContent=item[schema[0][0]]||'(untitled)';
+    head.appendChild(idx);head.appendChild(title);card.appendChild(head);
+    schema.forEach(([k,label,type])=>{
+      card.appendChild(field(label,k,type,item[k],v=>{item[k]=v;if(k===schema[0][0])title.textContent=v||'(untitled)';}));
+    });
+    const btns=document.createElement('div');btns.className='adm-rowbtns';
+    const up=document.createElement('button');up.className='adm-btn ghost';up.textContent='\u2191';up.title='Move up';
+    up.onclick=()=>{if(i>0){[arr[i-1],arr[i]]=[arr[i],arr[i-1]];drawList(tab);}};
+    const down=document.createElement('button');down.className='adm-btn ghost';down.textContent='\u2193';down.title='Move down';
+    down.onclick=()=>{if(i<arr.length-1){[arr[i+1],arr[i]]=[arr[i],arr[i+1]];drawList(tab);}};
+    const del=document.createElement('button');del.className='adm-btn danger';del.textContent='Delete';
+    del.onclick=()=>{if(confirm('Delete this item?')){arr.splice(i,1);drawList(tab);}};
+    btns.appendChild(up);btns.appendChild(down);btns.appendChild(del);
+    card.appendChild(btns);rows.appendChild(card);
+  });
+  body.appendChild(rows);
+  const add=document.createElement('button');add.className='adm-btn ghost adm-add';add.textContent='+ Add item';
+  add.onclick=()=>{const blank={};schema.forEach(([k])=>blank[k]='');arr.push(blank);drawList(tab);};
+  body.appendChild(add);
+}
+
+function draw(){
+  document.querySelectorAll('.adm-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===activeTab));
+  if(activeTab==='meta')drawMeta();
+  else if(activeTab==='shortcuts')drawShortcuts();
+  else drawList(activeTab);
+}
+
+/* build tabs */
+const tabsEl=document.getElementById('admTabs');
+TABS.forEach(t=>{
+  const b=document.createElement('button');b.className='adm-tab';b.dataset.tab=t;b.textContent=TAB_LABELS[t];
+  b.onclick=()=>{activeTab=t;draw();window.scrollTo({top:0,behavior:'smooth'});};
+  tabsEl.appendChild(b);
+});
+
+/* ---- export: serialize DATA back into a content.js file ---- */
+function jsString(s){return JSON.stringify(String(s));}
+function serializeArr(arr,keys){
+  return arr.map(o=>{
+    const parts=keys.filter(k=>o[k]!==undefined&&o[k]!=='').map(k=>{
+      if(k==='keys')return 'keys:['+o.keys.map(jsString).join(',')+']';
+      return k+':'+jsString(o[k]);
+    });
+    return '    {'+parts.join(',')+'}';
+  }).join(',\n');
+}
+function buildContentJs(){
+  let out='/* content.js — single source of truth: all site data + icon maps.\n';
+  out+='   Loaded by every page before app.js. Edit content here (or via /admin). */\n\n';
+  out+='const CONTENT = {\n';
+  out+='  meta:{ title:'+jsString(DATA.meta.title)+', tagline:'+jsString(DATA.meta.tagline)+' },\n';
+  out+='  switch:[\n'+serializeArr(DATA.switch,['topic','win','mac'])+'\n  ],\n';
+  out+='  shortcuts:[\n'+DATA.shortcuts.map(g=>
+    '    {group:'+jsString(g.group)+',items:[\n'
+    +g.items.map(it=>'      {label:'+jsString(it.label)+',keys:['+it.keys.map(jsString).join(',')+']}').join(',\n')
+    +'\n    ]}'
+  ).join(',\n')+'\n  ],\n';
+  out+='  gestures:[\n'+serializeArr(DATA.gestures,['name','how','ico','doc'])+'\n  ],\n';
+  out+='  apps:[\n'+serializeArr(DATA.apps,['name','icon','desc','img','url'])+'\n  ],\n';
+  out+='  faq:[\n'+serializeArr(DATA.faq,['q','a'])+'\n  ],\n';
+  out+='  resources:[\n'+serializeArr(DATA.resources,['rname','rdesc','url'])+'\n  ],\n';
+  out+='  accessibility:[\n'+serializeArr(DATA.accessibility,['name','desc','ico','url'])+'\n  ],\n';
+  out+='  videos:[\n'+serializeArr(DATA.videos,['title','yt','duration'])+'\n  ],\n';
+  out+='  helpEmail:'+jsString(DATA.helpEmail)+'\n';
+  out+='};\n\n';
+  // re-append BROWSE, ICONS, APP_ICONS verbatim from the live objects
+  out+='const BROWSE='+JSON.stringify(BROWSE,null,2).replace(/"([a-zA-Z_]+)":/g,'$1:')+';\n\n';
+  out+='const ICONS='+serializeIcons(ICONS)+';\n\n';
+  out+='const APP_ICONS='+serializeIcons(APP_ICONS)+';\n';
+  return out;
+}
+function serializeIcons(obj){
+  return '{\n'+Object.keys(obj).map(k=>'  '+k+':'+jsString(obj[k])).join(',\n')+'\n}';
+}
+
+document.getElementById('exportBtn').onclick=()=>{
+  const text=buildContentJs();
+  document.getElementById('output').value=text;
+  copyText(text);
+  document.getElementById('output').scrollIntoView({behavior:'smooth',block:'center'});
+};
+document.getElementById('copyOut').onclick=()=>copyText(document.getElementById('output').value);
+function copyText(t){
+  const flash=()=>{const f=document.getElementById('flash');f.classList.add('show');setTimeout(()=>f.classList.remove('show'),1600);};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(flash).catch(()=>{});}
+}
+
+/* init: header/footer chrome from app.js, then the editor */
+injectChrome(null);
+draw();
+</script>
+</body>
+</html>
